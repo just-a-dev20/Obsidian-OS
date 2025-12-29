@@ -28,3 +28,10 @@ enroll-key:
 fix-cinnamon:
     gsettings set org.cinnamon.desktop.interface gtk-theme "Mint-Y-Dark-Teal"
     gsettings set org.cinnamon.desktop.interface icon-theme "Mint-Y-Teal"
+
+# Agent commands for continue.dev
+agent-fix issue:
+    npx @continuedev/cli run "/fix {{issue}}"
+
+agent-improve instruction="Scan for improvements":
+    npx @continuedev/cli run "/improve {{instruction}}"
