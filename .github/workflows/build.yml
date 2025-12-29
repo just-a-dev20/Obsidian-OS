@@ -1,4 +1,4 @@
-name: Build and Push Cinnablue
+name: Build and Push Obsidian-OS
 on:
   schedule:
     - cron: '0 0 * * 1' # Weekly on Mondays
