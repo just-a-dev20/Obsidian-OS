@@ -1,0 +1,13 @@
+*.iso
+*.iso-CHECKSUM
+flatpaks_with_deps
+flatpak.*
+
+*_build
+*_build.*
+previous.manifest.json
+changelog.md
+output.env
+version.txt
+
+devcontainer
