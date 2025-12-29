@@ -75,6 +75,9 @@ This project is equipped with a `continue.dev` agent that can automatically fix 
 
 ### How to use:
 
+> [!NOTE]
+> **Prerequisite:** Local use of `just agent-*` commands requires **Node.js (v20+)** and **npm** to be installed and available on your PATH. (e.g., `brew install node` or visit [nodejs.org](https://nodejs.org/)).
+
 1.  **Fixing Issues:** Add the label `fix-me` to any issue. The agent will automatically attempt to fix it and open a pull request.
 2.  **Improving the Project:** Run the "Continue Agent" GitHub Action manually (workflow dispatch) with a specific instruction, or run `just agent-improve` locally.
 3.  **Local Development:** Use `just agent-fix "<issue description>"` or `just agent-improve "<improvement instruction>"` to trigger the agent via the CLI.
