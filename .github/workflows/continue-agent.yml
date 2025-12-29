@@ -1,6 +1,6 @@
 name: Continue Agent
 
-on:
+'on':
   issues:
     types: [opened, labeled]
   workflow_dispatch:
@@ -13,9 +13,9 @@ on:
 jobs:
   agent:
     if: >-
-      (github.event.label.name == 'fix-me' || 
-       github.event_name == 'workflow_dispatch' || 
-       (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'fix-me'))) && 
+      (github.event.label.name == 'fix-me' ||
+       github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'fix-me'))) &&
       vars.CONTINUE_AGENT_ENABLED == 'true'
     runs-on: ubuntu-latest
     permissions:
@@ -74,7 +74,7 @@ jobs:
           fi
 
           echo "Running Continue Agent to process task..."
-          
+
           # Run the agent
           # The agent is instructed in config.json to create a branch, commit, and PR.
           if npx @continuedev/cli run --prompt "$TASK" --config .continue/config.json; then
