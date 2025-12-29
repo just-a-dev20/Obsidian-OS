@@ -12,7 +12,11 @@ on:
 
 jobs:
   agent:
-    if: github.event.label.name == 'fix-me' || github.event_name == 'workflow_dispatch' || (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'fix-me'))
+    if: >-
+      (github.event.label.name == 'fix-me' || 
+       github.event_name == 'workflow_dispatch' || 
+       (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'fix-me'))) && 
+      vars.CONTINUE_AGENT_ENABLED == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -39,7 +43,7 @@ jobs:
       - name: Run Agent
         env:
           CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_BODY: ${{ github.event.issue.body }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
           INSTRUCTION: ${{ github.event.inputs.instruction }}
@@ -47,50 +51,38 @@ jobs:
           # Define the task
           if [ "${{ github.event_name }}" == "issues" ]; then
             TASK="Fix the following issue: $ISSUE_TITLE. Details: $ISSUE_BODY"
-            BRANCH_NAME="fix/issue-${{ github.event.issue.number }}"
           else
             TASK="$INSTRUCTION"
-            BRANCH_NAME="improve/task-$(date +%Y%m%d%H%M%S)"
           fi
 
           echo "Task: $TASK"
-          echo "Branch: $BRANCH_NAME"
 
           # Configure Git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Create new branch
-          git checkout -b "$BRANCH_NAME"
-
-          # Here we would normally run 'cn' to apply changes.
-          # Since 'cn' is still evolving for headless use, we use a prompt-based approach.
-          # For now, we'll use a placeholder that describes the intent.
-          # In a real setup, you'd use 'cn edit' or a custom script calling the LLM.
-          
-          echo "Running Continue Agent to process task..."
-          
-          # Placeholder for actual agent logic:
-          # npx @continuedev/cli run --prompt "$TASK" --config .continue/config.json
-          
-          # For the sake of this setup, we'll create a dummy change if it's a test run,
-          # but the goal is to have the 'cn' CLI do it.
-          # Since I am currently setting up the infrastructure, I'll ensure the config is ready.
+          # Inject API key into config.json
+          if [ -z "$CONTINUE_API_KEY" ]; then
+            echo "Error: CONTINUE_API_KEY is not set. Please add it to repository secrets."
+            exit 1
+          fi
+          sed -i "s|YOUR_API_KEY|$CONTINUE_API_KEY|g" .continue/config.json
 
           # Add a comment to the issue to acknowledge
           if [ "${{ github.event_name }}" == "issues" ]; then
             gh issue comment ${{ github.event.issue.number }} --body "I'm starting to work on this issue! I'll open a pull request shortly."
           fi
 
-          # NOTE: The actual implementation of 'cn run' in headless CI is 
-          # something that requires a specific API key and setup in .continue/config.json.
+          echo "Running Continue Agent to process task..."
           
-          # Finalize (if changes were made)
-          if [[ -n $(git status -s) ]]; then
-            git add .
-            git commit -m "Auto-fix/improvement: $TASK"
-            git push origin "$BRANCH_NAME"
-            gh pr create --title "Continue Agent: $TASK" --body "This is an automated change by the Continue Agent." --base main --head "$BRANCH_NAME"
+          # Run the agent
+          # The agent is instructed in config.json to create a branch, commit, and PR.
+          if npx @continuedev/cli run --prompt "$TASK" --config .continue/config.json; then
+            echo "Continue Agent completed successfully."
           else
-            echo "No changes detected."
+            echo "Continue Agent failed."
+            if [ "${{ github.event_name }}" == "issues" ]; then
+              gh issue comment ${{ github.event.issue.number }} --body "Oops! The Continue Agent encountered an error while processing this issue. Please check the logs for more details."
+            fi
+            exit 1
           fi
