@@ -9,7 +9,6 @@ on:
 
 env:
   IMAGE_NAME: obsidian-os
-  IMAGE_TAGS: latest
   IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
 
 jobs:
@@ -23,6 +22,20 @@ jobs:
       - name: Checkout Push to GHCR
         uses: actions/checkout@v4
 
+      - name: Lowercase Registry Owner
+        id: registry_case
+        run: |
+          echo "registry=${IMAGE_REGISTRY,,}" >> $GITHUB_OUTPUT
+
+      - name: Generate Tags
+        id: generate_tags
+        shell: bash
+        run: |
+          TIMESTAMP=$(date +%Y%m%d)
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          TAGS="latest ${TIMESTAMP} ${SHA_SHORT}"
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+
       - name: Build Image
         id: build_image
         uses: redhat-actions/buildah-build@v2
@@ -30,19 +43,28 @@ jobs:
           containerfiles: |
             ./Containerfile
           image: ${{ env.IMAGE_NAME }}
-          tags: ${{ env.IMAGE_TAGS }}
+          tags: ${{ steps.generate_tags.outputs.tags }}
           oci: true
 
       - name: Log in to GHCR
+        id: push
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build_image.outputs.image }}
           tags: ${{ steps.build_image.outputs.tags }}
-          registry: ${{ env.IMAGE_REGISTRY }}
+          registry: ${{ steps.registry_case.outputs.registry }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Sign container image
-        uses: ublue-os/cosign-installer@main
-        # Note: In a real setup, you'd configure signing keys.
-        # This is a placeholder for the process.
+        uses: sigstore/cosign-installer@v3.3.0
+        with:
+          cosign-release: 'v2.2.2'
+
+      - name: Sign the images
+        run: |
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ steps.registry_case.outputs.registry }}/${{ env.IMAGE_NAME }}@${{ steps.push.outputs.digest }}
+        env:
+          COSIGN_EXPERIMENTAL: false
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+        if: ${{ false }} # Disable signing until keys are set up
