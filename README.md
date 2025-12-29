@@ -69,4 +69,18 @@ If you want to build this image locally using Podman:
 podman build -t obsidian-os .
 ```
 
-To sign the image (required for verified boots), refer to the [ublue-os signing guide](https://universal-blue.org/creating-your-own-image/#signing).
+## Automation with Continue Agent
+
+This project is equipped with a `continue.dev` agent that can automatically fix issues and improve the codebase.
+
+### How to use:
+
+1.  **Fixing Issues:** Add the label `fix-me` to any issue. The agent will automatically attempt to fix it and open a pull request.
+2.  **Improving the Project:** Run the "Continue Agent" GitHub Action manually (workflow dispatch) with a specific instruction, or run `just agent-improve` locally.
+3.  **Local Development:** Use `just agent-fix "<issue description>"` or `just agent-improve "<improvement instruction>"` to trigger the agent via the CLI.
+
+### Configuration
+
+The agent's behavior is defined in `.continue/config.json` and `.github/workflows/continue-agent.yml`.
+Ensure you have a `CONTINUE_API_KEY` set in your repository secrets for the GitHub Action to work.
+

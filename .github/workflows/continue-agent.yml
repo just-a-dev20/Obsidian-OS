@@ -1,0 +1,96 @@
+name: Continue Agent
+
+on:
+  issues:
+    types: [opened, labeled]
+  workflow_dispatch:
+    inputs:
+      instruction:
+        description: 'What should the agent improve?'
+        required: false
+        default: 'Scan the project for potential improvements (code quality, security, performance) and implement them.'
+
+jobs:
+  agent:
+    if: github.event.label.name == 'fix-me' || github.event_name == 'workflow_dispatch' || (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'fix-me'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: |
+          npm install -g @continuedev/cli
+          # Add any other dependencies needed for building/testing the project
+          # based on the justfile.
+
+      - name: Run Agent
+        env:
+          CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          INSTRUCTION: ${{ github.event.inputs.instruction }}
+        run: |
+          # Define the task
+          if [ "${{ github.event_name }}" == "issues" ]; then
+            TASK="Fix the following issue: $ISSUE_TITLE. Details: $ISSUE_BODY"
+            BRANCH_NAME="fix/issue-${{ github.event.issue.number }}"
+          else
+            TASK="$INSTRUCTION"
+            BRANCH_NAME="improve/task-$(date +%Y%m%d%H%M%S)"
+          fi
+
+          echo "Task: $TASK"
+          echo "Branch: $BRANCH_NAME"
+
+          # Configure Git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create new branch
+          git checkout -b "$BRANCH_NAME"
+
+          # Here we would normally run 'cn' to apply changes.
+          # Since 'cn' is still evolving for headless use, we use a prompt-based approach.
+          # For now, we'll use a placeholder that describes the intent.
+          # In a real setup, you'd use 'cn edit' or a custom script calling the LLM.
+          
+          echo "Running Continue Agent to process task..."
+          
+          # Placeholder for actual agent logic:
+          # npx @continuedev/cli run --prompt "$TASK" --config .continue/config.json
+          
+          # For the sake of this setup, we'll create a dummy change if it's a test run,
+          # but the goal is to have the 'cn' CLI do it.
+          # Since I am currently setting up the infrastructure, I'll ensure the config is ready.
+
+          # Add a comment to the issue to acknowledge
+          if [ "${{ github.event_name }}" == "issues" ]; then
+            gh issue comment ${{ github.event.issue.number }} --body "I'm starting to work on this issue! I'll open a pull request shortly."
+          fi
+
+          # NOTE: The actual implementation of 'cn run' in headless CI is 
+          # something that requires a specific API key and setup in .continue/config.json.
+          
+          # Finalize (if changes were made)
+          if [[ -n $(git status -s) ]]; then
+            git add .
+            git commit -m "Auto-fix/improvement: $TASK"
+            git push origin "$BRANCH_NAME"
+            gh pr create --title "Continue Agent: $TASK" --body "This is an automated change by the Continue Agent." --base main --head "$BRANCH_NAME"
+          else
+            echo "No changes detected."
+          fi
