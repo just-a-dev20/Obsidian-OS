@@ -1,0 +1,13 @@
+[org/cinnamon/desktop/interface]
+gtk-theme='Mint-Y-Dark-Teal'
+icon-theme='Mint-Y-Teal'
+
+[org/cinnamon/theme]
+name='Mint-Y-Dark-Teal'
+
+[org/gnome/desktop/privacy]
+remember-recent-files=false
+
+[org/gnome/desktop/media-handling]
+automount=true
+automount-open=false
