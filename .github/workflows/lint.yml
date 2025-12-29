@@ -26,4 +26,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: extractions/setup-just@v1
       - name: Check Justfile formatting
-        run: just --fmt --check
+        run: just --unstable --fmt --check
