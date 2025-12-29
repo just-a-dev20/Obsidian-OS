@@ -55,5 +55,5 @@ RUN dconf update \
     && systemctl enable firewalld
 
 # Metadata
-LABEL org.opencontainers.image.title="Cinnablue" \
+LABEL org.opencontainers.image.title="Obsidian-OS" \
       org.opencontainers.image.description="Cinnamon-based Fedora Atomic with Bazzite/Aurora features"

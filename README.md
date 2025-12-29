@@ -1,6 +1,6 @@
-# Cinnablue: Custom Fedora Atomic (Cinnamon + Gaming + Dev)
+# Obsidian-OS: Custom Fedora Atomic (Cinnamon + Gaming + Dev)
 
-Cinnablue is a custom OCI image based on Fedora Atomic (Silverblue base), merging the gaming optimizations of **Bazzite** with the developer-centric workflow of **Aurora**, all while using **Cinnamon** as the primary desktop environment.
+Obsidian-OS is a custom OCI image based on Fedora Atomic (Silverblue base), merging the gaming optimizations of **Bazzite** with the developer-centric workflow of **Aurora**, all while using **Cinnamon** as the primary desktop environment.
 
 ## 🚀 Features
 
@@ -24,7 +24,7 @@ Cinnablue is a custom OCI image based on Fedora Atomic (Silverblue base), mergin
 
 ## 🛠️ Installation & Rebase
 
-To rebase an existing Fedora Silverblue/Kinoite installation to Cinnablue, follow these steps:
+To rebase an existing Fedora Silverblue/Kinoite installation to Obsidian-OS, follow these steps:
 
 ### 1. Preparation
 Ensure your system is up to date and you have backed up important data.
@@ -35,12 +35,12 @@ Ensure your system is up to date and you have backed up important data.
 rpm-ostree status
 ```
 
-### 3. Rebase to Cinnablue
+### 3. Rebase to Obsidian-OS
 Replace `<username>` with your GitHub username once the CI has published your image.
 
 ```bash
 # Rebase to the new image
-rpm-ostree rebase ostree-unverified-registry:ghcr.io/<username>/cinnablue:latest
+rpm-ostree rebase ostree-unverified-registry:ghcr.io/<username>/obsidian-os:latest
 ```
 
 ### 4. Reboot
@@ -66,7 +66,7 @@ just setup-dev
 If you want to build this image locally using Podman:
 
 ```bash
-podman build -t cinnablue .
+podman build -t obsidian-os .
 ```
 
 To sign the image (required for verified boots), refer to the [ublue-os signing guide](https://universal-blue.org/creating-your-own-image/#signing).

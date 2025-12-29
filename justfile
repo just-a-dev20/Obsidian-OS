@@ -1,4 +1,4 @@
-# Justfile for Cinnablue Custom Image
+# Justfile for Obsidian-OS Custom Image
 
 # Update the system
 update:
