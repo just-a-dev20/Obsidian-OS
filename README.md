@@ -89,7 +89,7 @@ The agent's behavior is defined in `.continue/config.json` and `.github/workflow
 > [!IMPORTANT]
 > **To enable the Continue Agent in GitHub Actions:**
 > 1. Set a repository variable `CONTINUE_AGENT_ENABLED` to `true`.
-> 2. Add your OpenAI API key to repository secrets as `CONTINUE_API_KEY`.
+> 2. Add your OpenRouter API key to repository secrets as `OPENROUTER_API_KEY`.
 > 3. Ensure the `GH_TOKEN` or default `GITHUB_TOKEN` has permissions to create pull requests.
 
 Once enabled, the agent will automatically trigger on issues labeled `fix-me`.

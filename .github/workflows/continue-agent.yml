@@ -42,7 +42,7 @@ jobs:
 
       - name: Run Agent
         env:
-          CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_BODY: ${{ github.event.issue.body }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
@@ -62,11 +62,11 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           # Inject API key into config.json
-          if [ -z "$CONTINUE_API_KEY" ]; then
-            echo "Error: CONTINUE_API_KEY is not set. Please add it to repository secrets."
+          if [ -z "$OPENROUTER_API_KEY" ]; then
+            echo "Error: OPENROUTER_API_KEY is not set. Please add it to repository secrets."
             exit 1
           fi
-          sed -i "s|YOUR_API_KEY|$CONTINUE_API_KEY|g" .continue/config.json
+          sed -i "s|YOUR_API_KEY|$OPENROUTER_API_KEY|g" .continue/config.json
 
           # Add a comment to the issue to acknowledge
           if [ "${{ github.event_name }}" == "issues" ]; then
