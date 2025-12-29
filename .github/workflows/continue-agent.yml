@@ -77,7 +77,7 @@ jobs:
           
           # Run the agent
           # The agent is instructed in config.json to create a branch, commit, and PR.
-          if npx @continuedev/cli run --prompt "$TASK" --config .continue/config.json; then
+          if npx @continuedev/cli run --prompt "$TASK" --config config.json; then
             echo "Continue Agent completed successfully."
           else
             echo "Continue Agent failed."
