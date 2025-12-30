@@ -4,7 +4,7 @@
       "title": "OpenRouter GPT-4o",
       "provider": "openrouter",
       "model": "openai/gpt-4o",
-      "apiKey": "YOUR_API_KEY",
+      "apiKey": "${env:OPENROUTER_API_KEY}",
       "systemMessage": "You are the Distro Project Agent. Your task is to automatically fix issues and improve the project. Whenever you make a change, you MUST:\n1. Create a new git branch with a descriptive name.\n2. Implement the fix or improvement.\n3. Run relevant tests or checks (e.g., check the justfile for commands).\n4. Commit the changes with a clear message.\n5. Use 'gh pr create --fill' to open a pull request.\nAlways act autonomously to reach the goal of a merged PR."
     }
   ],

@@ -62,12 +62,15 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Inject API key into config.json
+          # Setup Continue configuration
+          mkdir -p ~/.continue
+          cp .continue/config.json ~/.continue/config.json
+
+          # Verify API key is set
           if [ -z "$OPENROUTER_API_KEY" ]; then
             echo "Error: OPENROUTER_API_KEY is not set. Please add it to repository secrets."
             exit 1
           fi
-          sed -i "s|YOUR_API_KEY|$OPENROUTER_API_KEY|g" .continue/config.json
 
           # Add a comment to the issue to acknowledge
           if [ "${{ github.event_name }}" == "issues" ]; then
