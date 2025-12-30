@@ -11,13 +11,10 @@ FROM ghcr.io/ublue-os/base-main:latest
 # Copy prepared repos
 COPY --from=prep /tmp/system76-scheduler.repo /etc/yum.repos.d/
 
-# 1. Install RPMFusion
+# Install RPMFusion, Desktop, Dev Tools, Gaming Stack, and remove Firefox in one layer
 RUN rpm-ostree install \
     https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-
-# 2. Layer Cinnamon Desktop & Aurora Dev Tools
-RUN rpm-ostree install \
+    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm \
     @cinnamon-desktop \
     cinnamon-themes \
     mint-y-icons \
@@ -26,11 +23,6 @@ RUN rpm-ostree install \
     tailscale \
     git \
     neovim \
-    && rpm-ostree cleanup -m
-
-# 3. Gaming Stack (Bazzite-lite)
-# Including controller drivers and gaming utilities
-RUN rpm-ostree install \
     steam-devices \
     xpadneo \
     xone \
@@ -38,15 +30,13 @@ RUN rpm-ostree install \
     gamemode \
     vkBasalt \
     system76-scheduler \
+    && rpm-ostree override remove firefox || true \
     && rpm-ostree cleanup -m
 
 # 4. Security & Hardening
 COPY config/sysctl/99-security.conf /etc/sysctl.d/99-security.conf
 COPY config/firewalld/firewalld.conf /etc/firewalld/firewalld.conf
 COPY config/dconf/01-cinnamon-custom /etc/dconf/db/local.d/01-cinnamon-custom
-
-# Enforce Flatpak: Mask RPM Firefox to encourage Flatpak use
-RUN rpm-ostree override remove firefox || true
 
 # Update dconf and enable services
 RUN dconf update \
