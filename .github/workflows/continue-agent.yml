@@ -18,6 +18,7 @@ jobs:
        (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'fix-me'))) &&
       vars.CONTINUE_AGENT_ENABLED == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     permissions:
       contents: write
       pull-requests: write
@@ -77,12 +78,11 @@ jobs:
 
           # Run the agent
           # The agent is instructed in config.json to create a branch, commit, and PR.
-          if npx @continuedev/cli run -p "$TASK"; then
-            echo "Continue Agent completed successfully."
-          else
-            echo "Continue Agent failed."
-            if [ "${{ github.event_name }}" == "issues" ]; then
-              gh issue comment ${{ github.event.issue.number }} --body "Oops! The Continue Agent encountered an error while processing this issue. Please check the logs for more details."
-            fi
-            exit 1
-          fi
+          npx @continuedev/cli run -p "$TASK"
+
+      - name: Notify Failure
+        if: failure() && github.event_name == 'issues'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment ${{ github.event.issue.number }} --body "❌ The Continue Agent failed to process this issue. Please check the [workflow logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for more details."
