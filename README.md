@@ -1,6 +1,6 @@
 # Obsidian-OS: My Custom Fedora Atomic Setup
 
-Obsidian-OS is my personal OCI image based on Fedora Atomic (Silverblue base). It merges the gaming optimizations of **Bazzite** with the developer-centric workflow of **Aurora**, using **Cinnamon** as the primary desktop environment.
+Obsidian-OS is my personal OCI image based on **Bazzite**. It leverages Bazzite's gaming optimizations and adds a developer-centric workflow with **Cinnamon** as the primary desktop environment.
 
 > [!NOTE]
 > This is a personal configuration tailored to my specific workflow. Feel free to use it or fork it, but it is provided "as is".
