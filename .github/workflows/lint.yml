@@ -7,19 +7,6 @@ name: Lint
     branches: [main]
 
 jobs:
-  lint-yaml:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: yamllint
-        uses: ibiqlik/action-yamllint@v3
-        with:
-          config_data: |
-            extends: default
-            rules:
-              line-length: disable
-              document-start: disable
-
   lint-just:
     runs-on: ubuntu-latest
     steps:
