@@ -7,7 +7,9 @@ FROM ghcr.io/ublue-os/bazzite:latest
 # - system76-scheduler
 # - distrobox, tailscale
 RUN rpm-ostree install \
-    @cinnamon-desktop \
+    cinnamon \
+    cinnamon-desktop \
+    cinnamon-session \
     cinnamon-themes \
     mint-y-icons \
     ptyxis \

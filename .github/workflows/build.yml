@@ -7,6 +7,11 @@ name: Build and Push Obsidian-OS
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
 env:
   IMAGE_NAME: obsidian-os
   IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
@@ -14,10 +19,6 @@ env:
 jobs:
   push-ghcr:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
     steps:
       - name: Checkout Push to GHCR
         uses: actions/checkout@v4
