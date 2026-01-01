@@ -31,3 +31,4 @@ RUN dconf update \
 # Metadata
 LABEL org.opencontainers.image.title="Obsidian-OS" \
       org.opencontainers.image.description="Cinnamon-based Fedora Atomic with Bazzite features"
+      org.opencontainers.image.source="https://github.com/just-a-dev20/Obsidian-OS"
