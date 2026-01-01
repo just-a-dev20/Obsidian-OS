@@ -66,7 +66,7 @@ jobs:
           image: ${{ steps.build_image.outputs.image }}
           tags: ${{ steps.build_image.outputs.tags }}
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: ${{ steps.registry_case.outputs.owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
 
