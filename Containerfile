@@ -1,11 +1,5 @@
 FROM ghcr.io/ublue-os/bazzite:latest
 
-# Install Cinnamon Desktop and tools not included in Bazzite
-# Bazzite already includes:
-# - RPMFusion repositories
-# - Gaming stack (steam-devices, xpadneo, xone, mangohud, gamemode, vkBasalt)
-# - system76-scheduler
-# - distrobox, tailscale
 RUN rpm-ostree install \
     cinnamon \
     cinnamon-desktop \
@@ -22,6 +16,7 @@ RUN rpm-ostree install \
 COPY config/sysctl/99-security.conf /etc/sysctl.d/99-security.conf
 COPY config/firewalld/firewalld.conf /etc/firewalld/firewalld.conf
 COPY config/dconf/01-cinnamon-custom /etc/dconf/db/local.d/01-cinnamon-custom
+COPY config/brave/brave_policies.json /etc/brave/policies/managed
 
 # Update dconf and enable services
 RUN dconf update \
