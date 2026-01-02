@@ -75,6 +75,9 @@ jobs:
         with:
           cosign-release: 'v2.2.4'
 
+      - name: Login to GHCR for Cosign
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | cosign login ghcr.io -u ${{ steps.registry_case.outputs.owner }} --password-stdin
+
       - name: Sign the images
         run: |
           cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ steps.registry_case.outputs.registry }}/${{ env.IMAGE_NAME }}@${{ steps.push.outputs.digest }}
