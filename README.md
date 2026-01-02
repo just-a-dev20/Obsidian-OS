@@ -1,73 +1,108 @@
-# Obsidian-OS: My Custom Fedora Atomic Setup
+# 💎 Obsidian-OS
 
-Obsidian-OS is my personal OCI image based on **Bazzite**. It leverages Bazzite's gaming optimizations and adds a developer-centric workflow with **Cinnamon** as the primary desktop environment.
+[![Build and Push Obsidian-OS](https://github.com/just-a-dev20/Obsidian-OS/actions/workflows/build.yml/badge.svg)](https://github.com/just-a-dev20/Obsidian-OS/actions/workflows/build.yml)
 
-> [!NOTE]
-> This is a personal configuration tailored to my specific workflow. Feel free to use it or fork it, but it is provided "as is".
+**Obsidian-OS** is a custom, immutable OCI desktop image based on [Bazzite](https://bazzite.gg/). It combines the gaming performance and hardware support of Bazzite with the productivity-focused **Cinnamon Desktop Environment** and a hardened, developer-centric configuration.
 
-## 🚀 Features
-
-### 🎮 Gaming
-- **Steam & Lutris:** Pre-configured with drivers.
-- **Performance:** Includes `system76-scheduler`, `gamemode`, and `MangoHud`.
-- **Controllers:** Drivers for Xbox (`xpadneo`, `xone`) included.
-
-### 🛠️ Developer Workflow
-- **Ptyxis:** The container-aware terminal.
-- **Tools:** `git`, `neovim`, `distrobox` and `tailscale` pre-installed.
-
-### 🛡️ Security & Hardening
-- **Network:** `firewalld` optimized.
-- **Kernel:** Hardened sysctl tweaks.
-- **Sandboxing:** Firefox RPM removed in favor of Flatpak.
+> **Note:** This is a personal configuration designed for a specific workflow. It is fully open for use or forking, but comes with no warranties.
 
 ---
 
-## 🛠️ Installation & Rebase
+## ✨ Key Features
 
-To rebase an existing Fedora Silverblue/Kinoite installation to Obsidian-OS:
+### 🖥️ Desktop Experience
+- **Cinnamon Desktop:** A traditional, stable, and highly customizable desktop environment, replacing the default KDE/GNOME.
+- **Ptyxis:** A modern, container-aware terminal emulator tailored for Fedora Atomic workflows.
+- **Theming:** Pre-configured Mint-Y themes and icons for a cohesive look.
 
-### 1. Preparation
-Ensure your system is up to date and back up important data.
+### 🎮 Gaming Ready (Inherited from Bazzite)
+- **Drivers & Tools:** Pre-installed Steam, Lutris, and drivers for Xbox controllers (`xpadneo`, `xone`).
+- **Performance:** `system76-scheduler`, `gamemode`, `vkBasalt`, and `MangoHud` are configured out of the box.
 
-### 2. Rebase to Obsidian-OS
-Replace `<username>` with the GitHub username hosting this image.
+### 🛠️ Developer Ecosystem
+- **Tooling:** `git`, `neovim`, and `distrobox` are baked in.
+- **Containers:** Ready-to-use recipes for Fedora and Ubuntu toolboxes via `just`.
+- **Networking:** `tailscale` enabled for secure remote access.
+
+### 🛡️ Security & Hardening
+- **Network:** Optimized `firewalld` configuration.
+- **Kernel:** Hardened `sysctl` parameters (see `config/sysctl/99-security.conf`).
+- **Clean Base:** Firefox RPM removed in favor of sandboxed Flatpaks.
+- **Signed Images:** All builds are signed with Cosign for integrity verification.
+
+---
+
+## 🚀 Installation
+
+Obsidian-OS is designed to be layered on top of an existing Fedora Atomic installation (like Silverblue, Kinoite, or Bazzite).
+
+### 1. Rebase System
+Open a terminal on your current atomic setup and rebase to this image.
 
 ```bash
-rpm-ostree rebase ostree-unverified-registry:ghcr.io/<username>/obsidian-os:latest
+# Replace 'just-a-dev20' with your GitHub username if you forked the repo
+rpm-ostree rebase ostree-unverified-registry:ghcr.io/just-a-dev20/obsidian-os:latest
 ```
 
-### 3. Reboot
+### 2. Reboot
+Apply the changes by rebooting your system.
+
 ```bash
 systemctl reboot
 ```
 
-### 4. Post-Installation Setup
-After logging into Cinnamon, open a terminal and run the following to finish the setup:
-
-```bash
-# Update the system
-just update
-
-# Enable gaming optimizations
-just setup-gaming
-
-# Setup dev environment (Homebrew + Distrobox)
-just setup-dev
-
-# Fix Cinnamon theme quirks (optional)
-just fix-cinnamon
-
-# Enroll Secure Boot key (if needed for custom drivers)
-just enroll-key
-```
+### 3. Verification (Optional)
+You can verify the integrity of the image using the included public key (`cosign.pub`).
 
 ---
 
-## 🏗️ Building Locally (Advanced)
+## ⚙️ Post-Installation
 
-If you want to build this image locally using Podman:
+This image includes a `justfile` to simplify common management tasks. After rebooting into Obsidian-OS, open a terminal and run the following:
+
+### Initial Setup
+```bash
+# Update the system and flatpaks
+just update
+
+# Set up developer containers (Homebrew, Fedora/Ubuntu toolboxes)
+just setup-dev
+
+# Apply gaming optimizations (System76 scheduler, Steam permissions)
+just setup-gaming
+```
+
+
+
+---
+
+## 🏗️ Development & Building
+
+### Directory Structure
+- **`Containerfile`**: The blueprint for the OS image.
+- **`config/`**: System configuration overlays (`dconf`, `firewalld`, `sysctl`).
+- **`justfile`**: Client-side command runner.
+- **`.github/`**: CI/CD workflows for building and signing.
+
+### Local Build
+To build the image locally for testing:
 
 ```bash
 podman build -t obsidian-os .
 ```
+
+### Automated Build (CI)
+The project utilizes GitHub Actions to:
+1.  Build the image on a weekly schedule or `main` branch push.
+2.  Sign the image with Cosign.
+3.  Push the artifact to GitHub Container Registry (GHCR).
+
+---
+
+## 🤝 Contributing
+
+Issues and pull requests are welcome! If you have ideas for improvements or new features, feel free to open a discussion.
+
+## 📄 License
+
+This project is effectively open source. Please refer to the upstream [Bazzite](https://github.com/ublue-os/bazzite) and [Fedora](https://fedoraproject.org/) projects for their respective licensing.

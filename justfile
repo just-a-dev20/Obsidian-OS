@@ -19,19 +19,5 @@ setup-gaming:
     echo "Setting up Steam permissions..."
     flatpak override --user --filesystem=/mnt/games com.valvesoftware.Steam || true
 
-# Enroll Secure Boot key (if using custom kmods)
-enroll-key:
-    echo "Enrolling MOK key for custom drivers..."
-    sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 
-# Fix specific Cinnamon quirks
-fix-cinnamon:
-    gsettings set org.cinnamon.desktop.interface gtk-theme "Mint-Y-Dark-Teal"
-    gsettings set org.cinnamon.desktop.interface icon-theme "Mint-Y-Teal"
 
-# Agent commands for continue.dev
-agent-fix issue:
-    npx @continuedev/cli run "/fix {{issue}}"
-
-agent-improve instruction="Scan for improvements":
-    npx @continuedev/cli run "/improve {{instruction}}"
