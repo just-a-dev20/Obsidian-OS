@@ -23,6 +23,12 @@ RUN dconf update \
     && systemctl enable tailscaled \
     && systemctl enable firewalld
 
+# Enable GDM as display manager
+RUN systemctl enable gdm.service
+
+# Optionally, disable SDDM
+RUN systemctl disable sddm.service
+
 # Metadata
 LABEL org.opencontainers.image.title="Obsidian-OS" \
       org.opencontainers.image.description="Cinnamon-based Fedora Atomic with Bazzite features" \
