@@ -9,6 +9,7 @@ RUN rpm-ostree install \
     ptyxis \
     git \
     neovim \
+    gdm \
     && rpm-ostree override remove firefox || true \
     && rpm-ostree cleanup -m
 
