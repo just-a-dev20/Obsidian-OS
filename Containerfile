@@ -1,5 +1,8 @@
 FROM ghcr.io/ublue-os/bazzite:latest
 
+# Optionally, disable SDDM
+RUN systemctl disable sddm.service
+
 RUN rpm-ostree install \
     cinnamon \
     cinnamon-desktop \
@@ -26,9 +29,6 @@ RUN dconf update \
 
 # Enable GDM as display manager
 RUN systemctl enable gdm.service
-
-# Optionally, disable SDDM
-RUN systemctl disable sddm.service
 
 # Metadata
 LABEL org.opencontainers.image.title="Obsidian-OS" \
