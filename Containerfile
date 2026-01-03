@@ -1,18 +1,12 @@
 ARG BASE_IMAGE_NAME="bazzite"
-ARG FEDORA_MAJOR_VERSION="41"
+ARG FEDORA_MAJOR_VERSION="43"
 ARG SOURCE_IMAGE="${BASE_IMAGE_NAME}-main"
 ARG BASE_IMAGE="ghcr.io/ublue-os/${SOURCE_IMAGE}"
 ARG COMMON_IMAGE="ghcr.io/get-aurora-dev/common:latest"
-ARG COMMON_IMAGE_SHA=""
 ARG BREW_IMAGE="ghcr.io/ublue-os/brew:latest"
-ARG BREW_IMAGE_SHA=""
 
-FROM ${COMMON_IMAGE}@${COMMON_IMAGE_SHA} AS common
-FROM ${BREW_IMAGE}@${BREW_IMAGE_SHA} AS brew
-
-FROM scratch AS ctx
-COPY /build_files /build_files
-COPY /iso_files /iso_files
+FROM ${COMMON_IMAGE} AS common
+FROM ${BREW_IMAGE} AS brew
 
 # https://github.com/get-aurora-dev/common
 COPY --from=common /flatpaks /flatpaks
@@ -23,18 +17,15 @@ COPY --from=common /wallpapers /system_files/shared
 # https://github.com/ublue-os/brew
 COPY --from=brew /system_files /system_files/shared
 
-# Overwrite files from common if necessary
-COPY /system_files /system_files
-
 ## aurora image section
 FROM ${BASE_IMAGE}:${FEDORA_MAJOR_VERSION} AS base
 
 ARG AKMODS_FLAVOR="coreos-stable"
 ARG BASE_IMAGE_NAME="bazzite"
-ARG FEDORA_MAJOR_VERSION="41"
+ARG FEDORA_MAJOR_VERSION="43"
 ARG IMAGE_NAME="aurora"
 ARG IMAGE_VENDOR="ublue-os"
-ARG KERNEL="6.14.4-200.fc41.x86_64"
+ARG KERNEL="6.16.0-200.fc43.x86_64"
 ARG SHA_HEAD_SHORT="dedbeef"
 ARG UBLUE_IMAGE_TAG="stable"
 ARG VERSION=""
@@ -57,12 +48,6 @@ COPY config/brave/brave_policies.json /etc/brave/policies/managed
 RUN dconf update \
     && systemctl enable tailscaled \
     && systemctl enable firewalld
-
-# Build, cleanup, lint.
-RUN --mount=type=tmpfs,dst=/boot \
-    --mount=type=bind,from=ctx,source=/,target=/ctx \
-    --mount=type=secret,id=GITHUB_TOKEN \
-    /ctx/build_files/shared/build.sh
 
 # Makes `/opt` writeable by default
 # Needs to be here to make the main image build strict (no /opt there)
