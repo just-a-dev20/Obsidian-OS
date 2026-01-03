@@ -19,10 +19,7 @@ RUN dconf update \
     && systemctl enable firewalld
 
 # ---- Install Homebrew (preinstall) ----
-RUN NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
-    && echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' > /etc/profile.d/brew.sh \
-    && chmod +x /etc/profile.d/brew.sh \
-    && . /etc/profile.d/brew.sh
+RUN NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Use Homebrew to install opencode
 RUN brew install opencode
