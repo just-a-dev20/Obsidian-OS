@@ -1,25 +1,56 @@
-FROM ghcr.io/ublue-os/bazzite:latest
+ARG BASE_IMAGE_NAME="bazzite"
+ARG FEDORA_MAJOR_VERSION="41"
+ARG SOURCE_IMAGE="${BASE_IMAGE_NAME}-main"
+ARG BASE_IMAGE="ghcr.io/ublue-os/${SOURCE_IMAGE}"
+ARG COMMON_IMAGE="ghcr.io/get-aurora-dev/common:latest"
+ARG COMMON_IMAGE_SHA=""
+ARG BREW_IMAGE="ghcr.io/ublue-os/brew:latest"
+ARG BREW_IMAGE_SHA=""
 
-# Optionally, disable SDDM
-RUN systemctl disable sddm.service
+FROM ${COMMON_IMAGE}@${COMMON_IMAGE_SHA} AS common
+FROM ${BREW_IMAGE}@${BREW_IMAGE_SHA} AS brew
+
+FROM scratch AS ctx
+COPY /build_files /build_files
+COPY /iso_files /iso_files
+
+# https://github.com/get-aurora-dev/common
+COPY --from=common /flatpaks /flatpaks
+COPY --from=common /logos /logos
+COPY --from=common /system_files /system_files
+COPY --from=common /wallpapers /system_files/shared
+
+# https://github.com/ublue-os/brew
+COPY --from=brew /system_files /system_files/shared
+
+# Overwrite files from common if necessary
+COPY /system_files /system_files
+
+## aurora image section
+FROM ${BASE_IMAGE}:${FEDORA_MAJOR_VERSION} AS base
+
+ARG AKMODS_FLAVOR="coreos-stable"
+ARG BASE_IMAGE_NAME="bazzite"
+ARG FEDORA_MAJOR_VERSION="41"
+ARG IMAGE_NAME="aurora"
+ARG IMAGE_VENDOR="ublue-os"
+ARG KERNEL="6.14.4-200.fc41.x86_64"
+ARG SHA_HEAD_SHORT="dedbeef"
+ARG UBLUE_IMAGE_TAG="stable"
+ARG VERSION=""
+ARG IMAGE_FLAVOR=""
 
 RUN rpm-ostree install \
-    cinnamon \
-    cinnamon-desktop \
-    cinnamon-session \
-    cinnamon-themes \
-    mint-y-icons \
     ptyxis \
     git \
     neovim \
-    gdm \
+    brave-browser \
     && rpm-ostree override remove firefox || true \
     && rpm-ostree cleanup -m
 
 # Security & Hardening
 COPY config/sysctl/99-security.conf /etc/sysctl.d/99-security.conf
 COPY config/firewalld/firewalld.conf /etc/firewalld/firewalld.conf
-COPY config/dconf/01-cinnamon-custom /etc/dconf/db/local.d/01-cinnamon-custom
 COPY config/brave/brave_policies.json /etc/brave/policies/managed
 
 # Update dconf and enable services
@@ -27,10 +58,18 @@ RUN dconf update \
     && systemctl enable tailscaled \
     && systemctl enable firewalld
 
-# Enable GDM as display manager
-RUN systemctl enable gdm.service
+# Build, cleanup, lint.
+RUN --mount=type=tmpfs,dst=/boot \
+    --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=secret,id=GITHUB_TOKEN \
+    /ctx/build_files/shared/build.sh
+
+# Makes `/opt` writeable by default
+# Needs to be here to make the main image build strict (no /opt there)
+# This is for downstream images/stuff like k0s
+RUN rm -rf /opt && ln -s /var/opt /opt
 
 # Metadata
 LABEL org.opencontainers.image.title="Obsidian-OS" \
-      org.opencontainers.image.description="Cinnamon-based Fedora Atomic with Bazzite features" \
+      org.opencontainers.image.description="Bazzite image with some extra shit" \
       org.opencontainers.image.source="https://github.com/just-a-dev20/Obsidian-OS"
