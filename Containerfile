@@ -4,6 +4,7 @@ RUN rpm-ostree install \
         ptyxis \
         git \
         neovim \
+        tealdeer \
     && rpm-ostree override remove firefox || true \
     && rpm-ostree cleanup -m
 
@@ -16,6 +17,9 @@ COPY config/brave/brave_policies.json /etc/brave/policies/managed
 RUN dconf update \
     && systemctl enable tailscaled \
     && systemctl enable firewalld
+
+#  Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 # Metadata
 LABEL org.opencontainers.image.title="Obsidian-OS" \
